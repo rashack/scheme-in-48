@@ -1,6 +1,7 @@
 module Main where
 import Control.Monad
-import Data.Char (chr)
+import Data.Char (chr, ord)
+import Data.Bits (shift)
 import Numeric (readDec, readHex, readOct)
 import System.Environment
 import Text.ParserCombinators.Parsec hiding (spaces)
@@ -78,7 +79,9 @@ parseRadixNumber = do
   num <- many1 $ oneOf "0123456789abcdefABCDEF"
   return $ case radixPrefix of
     -- TODO: fix binary parsing
-    --             'b' -> Number $ readNum readBin num
+             -- TODO: find out how to jack in readBin
+             -- 'b' -> readBin num
+             'b' -> undefined --readBin num
              'o' -> Number $ readNum readOct num
              'd' -> Number $ readNum readDec num
              'x' -> Number $ readNum readHex num
@@ -86,10 +89,13 @@ parseRadixNumber = do
 readNum :: Num t1 => (String -> [(Integer, [Char])]) -> String -> Integer
 readNum baseReader numStr = case baseReader numStr of
                               [(num, "")] -> num
-                              otherwise -> 0 -- this should fail
+                              otherwise -> 0 -- TODO: this should probably fail
 
-readBin :: String -> Integer
-readBin = undefined
+readBin :: Parser LispVal
+readBin = do
+  ds <- many1 $ oneOf "01"
+  let (int, _) = foldr (\d (sum, e) -> (sum + (ord d - 48) * e, shift e 1)) (0, 1) ds
+  return $ Number $ toInteger int
 
 parseExpr :: Parser LispVal
 parseExpr = try parseRadixNumber

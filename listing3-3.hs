@@ -22,7 +22,7 @@ parseString :: Parser LispVal
 parseString = do char '"'
                  x <- many parseStrStr
                  char '"'
-                 return $ String $ foldl (++) "" x
+                 return $ String $ concat x
 
 parseStrStr :: Parser String
 parseStrStr = escapedChar
@@ -78,7 +78,7 @@ parseExpr = parseAtom
 readExpr :: String -> String
 readExpr input = case parse parseExpr "lisp" input of
     Left err -> "No match: " ++ show err
-    Right val -> "Found value" ++ show val
+    Right val -> "Found value: " ++ show val
 
 main :: IO ()
 main = do args <- getArgs

@@ -1,5 +1,6 @@
 module Main where
 import Control.Monad
+import Data.Char (chr)
 import System.Environment
 import Text.ParserCombinators.Parsec hiding (spaces)
 
@@ -29,14 +30,27 @@ parseStrStr = escapedChar
 
 normalChar :: Parser String
 normalChar = do
-  c <- noneOf "\""
+  c <- noneOf escapables
   return [c]
 
 escapedChar :: Parser String
 escapedChar = do
   char '\\'
-  c <- oneOf "\""
-  return [c]
+  c <- oneOf escapables
+  return [chr $ c2i c]
+
+escapables = "0abtnvfr\"\\"
+
+c2i '0'  =  0 -- NUL (null)
+c2i 'a'  =  7 -- BEL (bell)
+c2i 'b'  =  8 -- BS  (backspace)
+c2i 't'  =  9 -- HT  (horizontal tab)
+c2i 'n'  = 10 -- LF  (new line)
+c2i 'v'  = 11 -- VT  (vertical tab)
+c2i 'f'  = 12 -- FF  (form feed)
+c2i 'r'  = 13 -- CR  (carriage return)
+c2i '\"' = 34
+c2i '\\' = 92
 
 parseAtom :: Parser LispVal
 parseAtom = do first <- letter <|> symbol

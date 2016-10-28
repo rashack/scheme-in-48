@@ -1,6 +1,7 @@
 module Main where
 import Control.Monad
 import Data.Char (chr)
+import Numeric (readDec, readHex, readOct)
 import System.Environment
 import Text.ParserCombinators.Parsec hiding (spaces)
 
@@ -70,15 +71,36 @@ parseNumber = liftM (Number . read) $ many1 digit
 --   ds <- many1 digit
 --   return $ (Number . read) ds
 
+parseRadixNumber :: Parser LispVal
+parseRadixNumber = do
+  char '#'
+  radixPrefix <- oneOf "bodx"
+  num <- many1 $ oneOf "0123456789abcdefABCDEF"
+  return $ case radixPrefix of
+    -- TODO: fix binary parsing
+    --             'b' -> Number $ readNum readBin num
+             'o' -> Number $ readNum readOct num
+             'd' -> Number $ readNum readDec num
+             'x' -> Number $ readNum readHex num
+
+readNum :: Num t1 => (String -> [(Integer, [Char])]) -> String -> Integer
+readNum baseReader numStr = case baseReader numStr of
+                              [(num, "")] -> num
+                              otherwise -> 0 -- this should fail
+
+readBin :: String -> Integer
+readBin = undefined
+
 parseExpr :: Parser LispVal
-parseExpr = parseAtom
+parseExpr = try parseRadixNumber
+        <|> parseAtom
         <|> parseString
         <|> parseNumber
 
 readExpr :: String -> String
 readExpr input = case parse parseExpr "lisp" input of
-    Left err -> "No match: " ++ show err
-    Right val -> "Found value: " ++ show val
+                   Left err -> "No match: " ++ show err
+                   Right val -> "Found value: " ++ show val
 
 main :: IO ()
 main = do args <- getArgs

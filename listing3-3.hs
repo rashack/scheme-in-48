@@ -19,9 +19,24 @@ data LispVal = Atom String
 
 parseString :: Parser LispVal
 parseString = do char '"'
-                 x <- many (noneOf "\"")
+                 x <- many parseStrStr
                  char '"'
-                 return $ String x
+                 return $ String $ foldl (++) "" x
+
+parseStrStr :: Parser String
+parseStrStr = escapedChar
+          <|> normalChar
+
+normalChar :: Parser String
+normalChar = do
+  c <- noneOf "\""
+  return [c]
+
+escapedChar :: Parser String
+escapedChar = do
+  char '\\'
+  c <- oneOf "\""
+  return [c]
 
 parseAtom :: Parser LispVal
 parseAtom = do first <- letter <|> symbol

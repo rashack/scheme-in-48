@@ -16,6 +16,7 @@ properties = testGroup "Properties" [qcProps]
 
 
 pAtom     = parse parseAtom         "atom err"
+pChr      = parse parseChar         "character err"
 pStr      = parse parseString       "string err"
 pList     = parse parseList         "list err"
 pPair     = parse parseDottedList   "pair err"
@@ -26,6 +27,21 @@ pExpr     = parse parseExpr         "expression err"
 unitTests = testGroup "Unit tests"
   [ testCase "Simple atom is parsed" $
     (Right (Atom "foo")) @=? (pAtom "foo")
+
+
+  , testCase "Character '#\\a' is parsed" $
+    (Right (Character 'a')) @=? (pChr "#\\a ")
+  , testCase "Character '#\\A' is parsed" $
+    (Right (Character 'A')) @=? (pChr "#\\A ")
+  , testCase "Character '#\\(' is parsed" $
+    (Right (Character '(')) @=? (pChr "#\\( ")
+  , testCase "Character '#\\ ' is parsed" $
+    (Right (Character ' ')) @=? (pChr "#\\  ")
+  -- TODO: fix parsing of these
+  -- , testCase "Character '#\\space' is parsed" $
+  --   (Right (Character ' ')) @=? (pChr "#\\space")
+  -- , testCase "Character '#\\newline' is parsed" $
+  --   (Right (Character '\n')) @=? (pChr "#\\newline")
 
   , testCase "Boolean true is parsed" $
     (Right (Bool True)) @=? (pAtom "#t")

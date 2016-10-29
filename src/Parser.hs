@@ -16,6 +16,7 @@ spaces :: Parser ()
 spaces = skipMany1 space
 
 data LispVal = Atom String
+             | Character Char
              | List [LispVal]
              | DottedList [LispVal] LispVal
              | Number Integer
@@ -25,14 +26,15 @@ data LispVal = Atom String
 
 parseExpr :: Parser LispVal
 parseExpr = try parseRadixNumber
-        <|> parseAtom
-        <|> parseString
-        <|> parseNumber
-        <|> parseQuoted
-        <|> do char '('
-               x <- try parseList <|> parseDottedList
-               char ')'
-               return x
+            <|> parseChar
+            <|> parseAtom
+            <|> parseString
+            <|> parseNumber
+            <|> parseQuoted
+            <|> do char '('
+                   x <- try parseList <|> parseDottedList
+                   char ')'
+                   return x
 
 parseAtom :: Parser LispVal
 parseAtom = do first <- letter <|> symbol
@@ -42,6 +44,14 @@ parseAtom = do first <- letter <|> symbol
                           "#t" -> Bool True
                           "#f" -> Bool False
                           otherwise -> Atom atom
+
+-- TODO: implement support for space and newline (and...?)
+parseChar :: Parser LispVal
+parseChar = do
+  string "#\\"
+  c <- anyChar
+  lookAhead $ oneOf " )"
+  return $ Character c
 
 parseList :: Parser LispVal
 parseList = liftM List $ sepBy parseExpr spaces

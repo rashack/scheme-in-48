@@ -15,38 +15,49 @@ properties :: TestTree
 properties = testGroup "Properties" [qcProps]
 
 
-pAtom = parse parseAtom "atom err"
-pStr = parse parseString "string err"
---pElemSep = parse elemSep "elemSep err"
---pEmptyList = parse emptyList "emptyList err"
---pInt = parse int "int err"
---pTuple = parse tuple "tuple err"
+pAtom     = parse parseAtom         "atom err"
+pStr      = parse parseString       "string err"
+pList     = parse parseList         "list err"
+pPair     = parse parseDottedList   "pair err"
+pNum      = parse parseNumber       "number err"
+pRadixNum = parse parseRadixNumber  "radix number err"
+pExpr     = parse parseExpr         "expression err"
 
 unitTests = testGroup "Unit tests"
   [ testCase "Simple atom is parsed" $
     (Right (Atom "foo")) @=? (pAtom "foo")
 
+  , testCase "Boolean true is parsed" $
+    (Right (Bool True)) @=? (pAtom "#t")
+  , testCase "Boolean false is parsed" $
+    (Right (Bool False)) @=? (pAtom "#f")
+
   , testCase "Simple string is parsed" $
     (Right (String "str")) @=? (pStr "\"str\"")
+  , testCase "String with escaped quote is parsed" $
+    (Right (String "st\"r")) @=? (pStr "\"st\\\"r\"")
 
-  -- , testCase "Empty list is parsed" $
-  --   (Right Nil) @=? (pEmptyList "[]")
 
-  -- , testCase "Simple integer is parsed" $
-  --   (Right (Integer 123)) @=? (pInt "123")
+  , testCase "Number is parsed" $
+    (Right (Number 1337)) @=? (pNum "1337")
+  , testCase "Base 16 number is parsed" $
+    (Right (Number 255)) @=? (pRadixNum "#xff")
 
-  -- , testCase "Empty tuple is parsed" $
-  --   (Right (Tuple [])) @=? (parse (tuple [Nil]) "tuple err" "{}")
+  , testCase "List is parsed" $
+    (Right (List [Atom "f", Atom "x"])) @=? (pList "f x")
 
-    -- , testCase "Tuple with atom is parsed" $
-  --   (Right (Tuple [Atom "foo"]) @=? ((tuple atom) "{foo}")
+  , testCase "Dotted list is parsed" $
+    (Right (DottedList [Atom "id"] $ Number 7)) @=? (pPair "id . 7")
+
+  , testCase "Expression is parsed" $
+    (Right (List [Atom "e", Number 2, Atom "x"])) @=? (pExpr "(e 2 x)")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"
   [ QC.testProperty "An atom is parsed" $
-    forAll atomString (\s -> parse parseAtom "atom" s == Right (Atom s))
+    forAll atomString (\s -> pAtom s == Right (Atom s))
   , QC.testProperty "A string is parsed" $
-    forAll stringString (\s -> parse parseString "atom" ("\"" ++ s ++ "\"") == Right (String s))
+    forAll stringString (\s -> pStr ("\"" ++ s ++ "\"") == Right (String s))
   ]
 
 -- from https://wiki.haskell.org/QuickCheck_as_a_test_set_generator

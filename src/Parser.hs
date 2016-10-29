@@ -23,6 +23,17 @@ data LispVal = Atom String
              | Bool Bool
   deriving (Eq, Show)
 
+parseExpr :: Parser LispVal
+parseExpr = try parseRadixNumber
+        <|> parseAtom
+        <|> parseString
+        <|> parseNumber
+        <|> parseQuoted
+        <|> do char '('
+               x <- try parseList <|> parseDottedList
+               char ')'
+               return x
+
 parseAtom :: Parser LispVal
 parseAtom = do first <- letter <|> symbol
                rest <- many (letter <|> digit <|> symbol)
@@ -114,14 +125,3 @@ c2i 'f'  = 12 -- FF  (form feed)
 c2i 'r'  = 13 -- CR  (carriage return)
 c2i '\"' = 34
 c2i '\\' = 92
-
-parseExpr :: Parser LispVal
-parseExpr = try parseRadixNumber
-        <|> parseAtom
-        <|> parseString
-        <|> parseNumber
-        <|> parseQuoted
-        <|> do char '('
-               x <- try parseList <|> parseDottedList
-               char ')'
-               return x

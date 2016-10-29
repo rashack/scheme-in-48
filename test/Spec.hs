@@ -1,4 +1,5 @@
 import Control.Monad
+import LispVal
 import Parser
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -14,7 +15,6 @@ tests = testGroup "Tests" [properties, unitTests]
 properties :: TestTree
 properties = testGroup "Properties" [qcProps]
 
-
 pAtom     = parse parseAtom         "atom err"
 pChr      = parse parseChar         "character err"
 pStr      = parse parseString       "string err"
@@ -23,6 +23,10 @@ pPair     = parse parseDottedList   "pair err"
 pNum      = parse parseNumber       "number err"
 pRadixNum = parse parseRadixNumber  "radix number err"
 pExpr     = parse parseExpr         "expression err"
+
+showExpr s = case pExpr s of
+               Left err -> show err
+               Right val -> show val
 
 unitTests = testGroup "Unit tests"
   [ testCase "Simple atom is parsed" $
@@ -85,6 +89,9 @@ unitTests = testGroup "Unit tests"
       \     (lambda (f)         \
       \       (le (lambda (x)   \
       \             ((f f) x)))))))")
+
+  , testCase "Expression is parsed and showed" $
+    "(quote (1 3 (\"this\" \"one\")))" @=? (showExpr "'(1 3 (\"this\" \"one\"))")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

@@ -3,6 +3,7 @@ module Parser where
 import Control.Monad
 import Data.Char (chr, ord)
 import Data.Bits (shift)
+import LispVal
 import Numeric (readDec, readHex, readOct)
 import Text.ParserCombinators.Parsec hiding (spaces)
 
@@ -14,15 +15,6 @@ symbol = oneOf symbols
 
 spaces :: Parser ()
 spaces = skipMany1 space
-
-data LispVal = Atom String
-             | Character Char
-             | List [LispVal]
-             | DottedList [LispVal] LispVal
-             | Number Integer
-             | String String
-             | Bool Bool
-  deriving (Eq, Show)
 
 parseExpr :: Parser LispVal
 parseExpr = try parseRadixNumber

@@ -53,6 +53,22 @@ unitTests = testGroup "Unit tests"
 
   , testCase "Expression is parsed" $
     (Right (List [Atom "e", Number 2, Atom "x"])) @=? (pExpr "(e 2 x)")
+
+  , testCase "Y-combinator is parsed" $
+    (Right (List [Atom "define", Atom "Y",
+                  List [Atom "lambda", List[Atom "le"],
+                        List [List [Atom "lambda", List [Atom "f"], List [Atom "f", Atom "f"]],
+                              List [Atom "lambda", List [Atom "f"],
+                                    List [Atom "le", List [Atom "lambda", List [Atom "x"],
+                                                           List [List [Atom "f", Atom "f"], Atom "x"]]]]]]]))
+    @=?
+    (pExpr $
+      "(define Y"               ++
+      "  (lambda (le)"          ++
+      "    ((lambda (f) (f f))" ++
+      "     (lambda (f)"        ++
+      "       (le (lambda (x)"  ++
+      "             ((f f) x)))))))")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

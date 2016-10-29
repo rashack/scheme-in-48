@@ -63,12 +63,12 @@ unitTests = testGroup "Unit tests"
                                                            List [List [Atom "f", Atom "f"], Atom "x"]]]]]]]))
     @=?
     (pExpr $
-      "(define Y"               ++
-      "  (lambda (le)"          ++
-      "    ((lambda (f) (f f))" ++
-      "     (lambda (f)"        ++
-      "       (le (lambda (x)"  ++
-      "             ((f f) x)))))))")
+      "(define Y                \
+      \  (lambda (le)           \
+      \    ((lambda (f) (f f))  \
+      \     (lambda (f)         \
+      \       (le (lambda (x)   \
+      \             ((f f) x)))))))")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

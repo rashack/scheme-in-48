@@ -4,7 +4,6 @@ import Control.Monad
 import Data.Char (chr, ord)
 import Data.Bits (shift)
 import Numeric (readDec, readHex, readOct)
-import Test.QuickCheck
 import Text.ParserCombinators.Parsec hiding (spaces)
 
 letters = ['a'..'z'] ++ ['A'..'Z']
@@ -126,47 +125,3 @@ parseExpr = try parseRadixNumber
                x <- try parseList <|> parseDottedList
                char ')'
                return x
-
-
--- quickcheck --
-
-
--- from https://wiki.haskell.org/QuickCheck_as_a_test_set_generator
-neStringOf :: [a] -> [a] -> Gen [a]
-neStringOf charsStart charsRest =
-  do s <- elements charsStart
-     r <- listOf' $ elements charsRest
-     return (s:r)
-
-listOf' :: Gen a -> Gen [a]
-listOf' gen = sized $ \n ->
-  do k <- choose (0, n)
-     vectorOf' k gen
-
-vectorOf' :: Int -> Gen a -> Gen [a]
-vectorOf' k gen = sequence [ gen | _ <- [1..k] ]
-
-instance Arbitrary LispVal where
-  arbitrary = liftM Atom atomString
-
---    n <- choose $ oneof "abc"
---    return  $ Atom n
-
-atomString :: Gen String
-atomString = neStringOf letters $ letters ++ symbols
-
-prop_atom :: Property
-prop_atom = forAll atomString (\s -> parse parseAtom "atom" s == Right (Atom s))
-
--- TODO: expand to include escaped characters
-stringString :: Gen String
-stringString = listOf $ elements $ letters ++ symbols
-
-prop_string :: Property
-prop_string = forAll stringString (\s -> parse parseString "atom" ("\"" ++ s ++ "\"") == Right (String s))
-
---prop_number n = parse parseNumber "number" n == Right (Number n)
-
--- quickCheck (prop_atom :: String -> Bool)
--- generate arbitrary :: IO LispVal
--- sample atomString

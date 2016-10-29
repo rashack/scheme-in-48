@@ -6,13 +6,12 @@ import System.Environment
 import Text.ParserCombinators.Parsec hiding (spaces)
 
 main :: IO ()
-main = do args <- getArgs
-          putStrLn (readExpr (args !! 0))
+main = getArgs >>= print . eval . readExpr . head
 
-readExpr :: String -> String
+readExpr :: String -> LispVal
 readExpr input = case parse parseExpr "lisp" input of
-                   Left err -> "No match: " ++ show err
-                   Right val -> "Found value: " ++ show val
+                   Left err -> String $ "No match: " ++ show err
+                   Right val -> val
 
 eval :: LispVal -> LispVal
 eval val@(String _) = val

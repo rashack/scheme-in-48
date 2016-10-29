@@ -43,8 +43,10 @@ unitTests = testGroup "Unit tests"
   , testCase "Base 16 number is parsed" $
     (Right (Number 255)) @=? (pRadixNum "#xff")
 
-  , testCase "List is parsed" $
+  , testCase "List (no parens) is parsed" $
     (Right (List [Atom "f", Atom "x"])) @=? (pList "f x")
+  , testCase "List (parens) is parsed" $
+    (Right (List [Atom "f", Atom "x"])) @=? (pExpr "(f x)")
 
   , testCase "Dotted list is parsed" $
     (Right (DottedList [Atom "id"] $ Number 7)) @=? (pPair "id . 7")

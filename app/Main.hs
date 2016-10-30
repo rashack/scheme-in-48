@@ -32,26 +32,27 @@ apply func args = maybe (throwError $ NotFunction "Unrecognized primitive functi
                         (lookup func primitives)
 
 primitives :: [(String, [LispVal] -> ThrowsError LispVal)]
-primitives = [("+", numericBinop (+)),
-              ("-", numericBinop (-)),
-              ("*", numericBinop (*)),
-              ("/", numericBinop div),
-              ("mod", numericBinop mod),
-              ("quotient", numericBinop quot),
-              ("remainder", numericBinop rem),
-              ("=", numBoolBinop (==)),
-              ("<", numBoolBinop (<)),
-              (">", numBoolBinop (>)),
-              ("/=", numBoolBinop (/=)),
-              (">=", numBoolBinop (>=)),
-              ("<=", numBoolBinop (<=)),
-              ("&&", boolBoolBinop (&&)),
-              ("||", boolBoolBinop (||)),
-              ("string=?", strBoolBinop (==)),
-              ("string<?", strBoolBinop (<)),
-              ("string>?", strBoolBinop (>)),
-              ("string<=?", strBoolBinop (<=)),
-              ("string>=?", strBoolBinop (>=))]
+primitives = [ ("+",          numericBinop  (+))
+             , ("-",          numericBinop  (-))
+             , ("*",          numericBinop  (*))
+             , ("/",          numericBinop  div)
+             , ("mod",        numericBinop  mod)
+             , ("quotient",   numericBinop  quot)
+             , ("remainder",  numericBinop  rem)
+             , ("=",          numBoolBinop  (==))
+             , ("<",          numBoolBinop  (<))
+             , (">",          numBoolBinop  (>))
+             , ("/=",         numBoolBinop  (/=))
+             , (">=",         numBoolBinop  (>=))
+             , ("<=",         numBoolBinop  (<=))
+             , ("&&",         boolBoolBinop (&&))
+             , ("||",         boolBoolBinop (||))
+             , ("string=?",   strBoolBinop  (==))
+             , ("string<?",   strBoolBinop  (<))
+             , ("string>?",   strBoolBinop  (>))
+             , ("string<=?",  strBoolBinop  (<=))
+             , ("string>=?",  strBoolBinop  (>=))
+             ]
 
 numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
 numericBinop op           []  = throwError $ NumArgs 2 []

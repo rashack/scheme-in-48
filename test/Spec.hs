@@ -1,6 +1,6 @@
 import Control.Monad
 import LispVal
-import Parser
+import LispParser
 import Test.Tasty
 import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck as QC

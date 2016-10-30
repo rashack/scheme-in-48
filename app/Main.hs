@@ -2,8 +2,8 @@ module Main where
 
 import Control.Monad.Error
 import LispError
+import LispParser
 import LispVal
-import Parser
 import System.Environment
 import Text.ParserCombinators.Parsec hiding (spaces)
 

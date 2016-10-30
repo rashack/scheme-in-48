@@ -1,4 +1,4 @@
-module Parser where
+module LispParser where
 
 import Control.Monad
 import Data.Char (chr, ord)

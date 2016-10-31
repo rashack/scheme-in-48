@@ -1,8 +1,10 @@
 module LispParser where
 
 import Control.Monad
+import Control.Monad.Error
 import Data.Char (chr, ord)
 import Data.Bits (shift)
+import LispError
 import LispVal
 import Numeric (readDec, readHex, readOct)
 import Text.ParserCombinators.Parsec hiding (spaces)
@@ -15,6 +17,11 @@ symbol = oneOf symbols
 
 spaces :: Parser ()
 spaces = skipMany1 space
+
+readExpr :: String -> ThrowsError LispVal
+readExpr input = case parse parseExpr "lisp" input of
+                   Left err -> throwError $ Parser err
+                   Right val -> return val
 
 parseExpr :: Parser LispVal
 parseExpr = try parseRadixNumber

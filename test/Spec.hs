@@ -1,4 +1,6 @@
 import Control.Monad
+import LispError
+import LispEval
 import LispVal
 import LispParser
 import Test.Tasty
@@ -24,9 +26,13 @@ pNum      = parse parseNumber       "number err"
 pRadixNum = parse parseRadixNumber  "radix number err"
 pExpr     = parse parseExpr         "expression err"
 
+showExpr :: String -> String
 showExpr s = case pExpr s of
                Left err -> show err
                Right val -> show val
+
+evalExpr :: String -> Either LispError LispVal
+evalExpr e = readExpr e >>= eval
 
 unitTests = testGroup "Unit tests"
   [ testCase "Simple atom is parsed" $
@@ -92,6 +98,9 @@ unitTests = testGroup "Unit tests"
 
   , testCase "Expression is parsed and showed" $
     "(quote (1 3 (\"this\" \"one\")))" @=? (showExpr "'(1 3 (\"this\" \"one\"))")
+
+  , testCase "String equality" $
+    (Right (Bool True)) @=? (evalExpr "(string=? \"test\"  \"test\")")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

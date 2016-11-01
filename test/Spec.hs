@@ -101,6 +101,19 @@ unitTests = testGroup "Unit tests"
 
   , testCase "String equality" $
     (Right (Bool True)) @=? (evalExpr "(string=? \"test\"  \"test\")")
+  , testCase "Less than is true" $
+    (Right (Bool True)) @=? (evalExpr "(< 2 3)")
+  , testCase "Greater than is true" $
+    (Right (Bool True)) @=? (evalExpr "(> 3 2)")
+  , testCase "Greater or equal than is true" $
+    (Right (Bool True)) @=? (evalExpr "(>= 3 3)")
+  , testCase "String less than is true" $
+    (Right (Bool True)) @=? (evalExpr "(string<? \"abc\" \"bba\")")
+
+  , testCase "'if' false branch" $
+    (Right (String "yes")) @=? (evalExpr "(if (> 2 3) \"no\" \"yes\")")
+  , testCase "'if' true branch" $
+    (Right (Number 9)) @=? (evalExpr "(if (= 3 3) (+ 2 3 (- 5 1)) \"unequal\")")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

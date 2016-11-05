@@ -47,12 +47,12 @@ primitives = [ ("+",          numericBinop  (+))
              , ("string>?",   strBoolBinop  (>))
              , ("string<=?",  strBoolBinop  (<=))
              , ("string>=?",  strBoolBinop  (>=))
-             , ("car", car)
-             , ("cdr", cdr)
-             , ("cons", cons)
-             , ("eq?", eqv)
-             , ("eqv?", eqv)
-             , ("equal?", equal)
+             , ("car",        car)
+             , ("cdr",        cdr)
+             , ("cons",       cons)
+             , ("eq?",        eqv)
+             , ("eqv?",       eqv)
+             , ("equal?",     equal)
              ]
 
 numericBinop :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal

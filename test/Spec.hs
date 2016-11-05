@@ -114,6 +114,48 @@ unitTests = testGroup "Unit tests"
     (Right (String "yes")) @=? (evalExpr "(if (> 2 3) \"no\" \"yes\")")
   , testCase "'if' true branch" $
     (Right (Number 9)) @=? (evalExpr "(if (= 3 3) (+ 2 3 (- 5 1)) \"unequal\")")
+
+  , testCase "'car' returns first element of list" $
+    (Right (Atom "a")) @=? (evalExpr "(car '(a b c))")
+  , testCase "'car' returns element from singleton list" $
+    (Right (Atom "a")) @=? (evalExpr "(car '(a))")
+  , testCase "'car' returns first element from dotted list" $
+    (Right (Atom "a")) @=? (evalExpr "(car '(a b . c))")
+  , testCase "'car' throws an error for non list argument" $
+    (Left (TypeMismatch "pair" (Atom "a"))) @=? (evalExpr "(car 'a)")
+  , testCase "'car' throws error for more that one argument" $
+    (Left (NumArgs 1 [Atom "a", Atom "b"])) @=? (evalExpr "(car 'a 'b)")
+
+  , testCase "'cdr' returns rest of list" $
+    (Right (List [Atom "b", Atom "c"])) @=? (evalExpr "(cdr '(a b c))")
+  , testCase "'cdr' returns singleton list with last element from list of two elements" $
+    (Right (List [Atom "b"])) @=? (evalExpr "(cdr '(a b))")
+  , testCase "'cdr' returns NIL from singleton list" $
+    (Right (List [])) @=? (evalExpr "(cdr '(a))")
+  , testCase "'cdr' returns second element of pair" $
+    (Right (Atom "b")) @=? (evalExpr "(cdr '(a . b))")
+  , testCase "'cdr' returns dotted list from dotted list" $
+    (Right (DottedList [Atom "b"] (Atom "c"))) @=? (evalExpr "(cdr '(a b . c))")
+  , testCase "'cdr' throws an error for non list argument" $
+    (Left (TypeMismatch "pair" (Atom "a"))) @=? (evalExpr "(cdr 'a)") -- = error – not a list
+  , testCase "'cdr' throws error for more that one argument " $
+    (Left (NumArgs 1 [Atom "a", Atom "b"])) @=? (evalExpr "(cdr 'a 'b)") -- = error – too many arguments
+
+  , testCase "'cons' builds a pair" $
+    (Right (DottedList [List [Atom "this", Atom "is"]] $ Atom "test")) @=? (evalExpr "(cons '(this is) 'test)")
+  , testCase "'cons' builds a list" $
+    (Right (List [List [Atom "this", Atom "is"]])) @=? (evalExpr "(cons '(this is) '())")
+
+  , testCase "'eqv?' returns #f for unequal numbers" $
+    (Right (Bool False)) @=? (evalExpr "(eqv? 1 3)")
+  , testCase "'eqv?' returns #t for equal numbers" $
+    (Right (Bool True)) @=? (evalExpr "(eqv? 3 3)")
+  , testCase "'eqv?' returns #t for equal atoms" $
+    (Right (Bool True)) @=? (evalExpr "(eqv? 'atom 'atom)")
+  , testCase "'eqv?' returns #f for different types" $
+    (Right (Bool False)) @=? (evalExpr "(eqv? 2 \"2\")")
+  , testCase "'equal?' returns #t for different types" $
+    (Right (Bool True)) @=? (evalExpr "(equal? 2 \"2\")")
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

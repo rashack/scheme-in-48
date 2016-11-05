@@ -5,11 +5,14 @@ import LispError
 import LispEval
 import LispParser
 import LispVal
+import Repl
 import System.Environment
 import Text.ParserCombinators.Parsec hiding (spaces)
 
 main :: IO ()
 main = do
   args <- getArgs
-  evaled <- return $ liftM show $ readExpr (args !! 0) >>= eval
-  putStrLn $ extractValue $ trapError evaled
+  case length args of
+    0 -> runRepl
+    1 -> evalAndPrint $ args !! 0
+    otherwise -> putStrLn "Program takes only 0 or 1 argument"

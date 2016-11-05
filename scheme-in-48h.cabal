@@ -19,6 +19,7 @@ library
                      , LispEval
                      , LispParser
                      , LispVal
+                     , Repl
   build-depends:       base >= 4.7 && < 5
                      , mtl
                      , parsec
